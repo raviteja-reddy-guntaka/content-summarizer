@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Summarizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <h1>Content Summarizer</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pdf" required>
+        <button type="submit">Summarize</button>
+    </form>
+    <div id="summary"></div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('summary').innerHTML = `<p class="error">${data.error}</p>`;
+                } else {
+                    document.getElementById('summary').innerHTML = marked.parse(data.summary);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('summary').innerHTML = '<p class="error">An error occurred. Please try again.</p>';
+            });
+        });
+    </script>
+</body>
+</html>
